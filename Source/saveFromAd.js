@@ -2,7 +2,7 @@
 // @description  Userscript pour enregistrer une annonce Leboncoin
 // @author       Max1Truc
 
-function modifyDOM() {
+var intervalId = setInterval(() => {
   function getAllElementsWithThisInnerTextValue(value) {
     var all = document.getElementsByTagName("*");
     var list = [];
@@ -36,8 +36,15 @@ function modifyDOM() {
     var title = document.getElementsByClassName("_1KQme")[0].innerText,
       description = getAllElementsWithAttributeValue("data-qa-id", "adview_description_container")[0].children[0].innerText,
       price = document.getElementsByClassName("_1F5u3")[0].innerText;
-    localStorage.setItem("save", JSON.stringify({title, description, price}));
-  });
-}
+    localStorage.setItem("save", JSON.stringify({
+      title,
+      description,
+      price
+    }));
 
-setInterval(modifyDOM, 500);
+    window.open('https://www.leboncoin.fr/ai?ca=12_s'); // Opens a new tab to create a new ad
+  });
+
+  // If this interval is finished, it disallow other intervals to repatch the page and prevents bugs.
+  clearInterval(intervalId);
+}, 500);
