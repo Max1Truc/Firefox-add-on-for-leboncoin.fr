@@ -1,4 +1,4 @@
-_Code source / source code:_ <https://bitbucket.org/max1truc/firefox-add-on-for-leboncoin.fr/src>
+_Code source / source code: <https://bitbucket.org/max1truc/firefox-add-on-for-leboncoin.fr/src>_
 
 ## Presentation
 
