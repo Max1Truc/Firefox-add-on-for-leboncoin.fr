@@ -10,11 +10,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://max1truc@bitbucket.org/max1truc/firefox-add-on-for-leboncoin.fr.git"
+    "url": "https://github.com/Max1Truc/Firefox-add-on-for-leboncoin.fr.git"
   },
   "author": "Max1Truc",
   "license": "MIT",
-  "homepage": "https://bitbucket.org/max1truc/firefox-add-on-for-leboncoin.fr#readme",
+  "homepage": "https://github.com/Max1Truc/Firefox-add-on-for-leboncoin.fr#readme",
   "dependencies": {
     "archiver": "^2.1.1"
   }
