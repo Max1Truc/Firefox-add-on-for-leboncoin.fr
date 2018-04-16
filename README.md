@@ -31,4 +31,4 @@ LeBonCoin think you should have to pay to modify an ad, this extension permit yo
 
 3.  Click on it
 
-4.  You can now modify the new ad and delete the old ad.
+4.  You can now modify the new ad and delete the old one.
