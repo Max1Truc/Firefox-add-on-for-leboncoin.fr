@@ -34,10 +34,12 @@ var intervalId = setInterval(() => {
 
   modifyButton.addEventListener("click", () => {
     var title = document.getElementsByClassName("_1KQme")[0].innerText,
+      category = getAllElementsWithAttributeValue("data-qa-id", "breadcrumb-item-2")[0].innerText,
       description = getAllElementsWithAttributeValue("data-qa-id", "adview_description_container")[0].children[0].innerText,
       price = document.getElementsByClassName("_1F5u3")[0].innerText;
     localStorage.setItem("save", JSON.stringify({
       title,
+      category,
       description,
       price
     }));
