@@ -26,8 +26,8 @@ var intervalId = setInterval(() => {
     return matchingElements;
   }
 
-  var modifyButton = getAllElementsWithThisInnerTextValue("Modifier l'annonce")[0];
-  var modifyButtonText = getAllElementsWithThisInnerTextValue("Modifier l'annonce")[2];
+  var modifyButton = getAllElementsWithThisInnerTextValue("Modifier l’annonce")[0];
+  var modifyButtonText = getAllElementsWithThisInnerTextValue("Modifier l’annonce")[2];
   modifyButtonText.setAttribute("class", "");
   modifyButtonText.style.color = "green";
   modifyButton.removeAttribute("href");
