@@ -4,7 +4,7 @@
   "description": "Cette extension pour Firefox permet de modifier des annonces LeBonCoin.fr",
   "version": "2.0",
   "browser_action": {
-    "default_icon": "icon.png"
+    "default_icon": "icon.svg"
   },
   "icons": {
     "32": "icon-32.png",
