@@ -37,7 +37,7 @@ var intervalID = setInterval(() => {
     for (let image_id = 0; image_id < 3; image_id++) { // For each one of the three images
       setTimeout(() => {
         window.eval("(" + ((image_id) => { // Execute following code with window scope
-          function dataURLtoFile(dataurl, filename) {
+          function dataURLtoFile(dataurl, filename) { // Convert a data url to a File object (https://stackoverflow.com/a/30407840/9438168)
             var arr = dataurl.split(','),
               mime = arr[0].match(/:(.*?);/)[1],
               bstr = atob(arr[1]),
@@ -52,6 +52,7 @@ var intervalID = setInterval(() => {
           }
 
           var dataurl = localStorage.getItem("image" + image_id);
+          // Programmatically upload a file to an <input type="file"> (https://stackoverflow.com/a/47172409/9438168)
           const dT = new DataTransfer();
           var file = dataURLtoFile(dataurl, "image.jpg");
 

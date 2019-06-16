@@ -42,6 +42,7 @@ var intervalId = setInterval(() => {
   }
 
   function getDataURL(div, callback) {
+    // Gets dataURL of an image (with the help of https://jsfiddle.net/handtrix/YvQ5y/4955)
     var url = div.style.backgroundImage.split('("')[1].split('")')[0];
     var xhr = new XMLHttpRequest();
     xhr.onload = function() {
@@ -57,7 +58,7 @@ var intervalId = setInterval(() => {
   }
 
   function photosBackup() {
-    // Backup the images
+    // Backups the images
     var all_images = document.querySelectorAll('div[alt=""]');
     for (let i = 0; i < all_images.length; i++) {
       getDataURL(all_images[i], (result) => localStorage.setItem("image" + i, result));
@@ -65,14 +66,14 @@ var intervalId = setInterval(() => {
   }
 
   var modifyButton = getAllElementsWithThisInnerTextValue("Modifier l’annonce")[0];
-  modifyButton.outerHTML = "<a>" + modifyButton.innerHTML + "</a>"
+  modifyButton.outerHTML = "<a>" + modifyButton.innerHTML + "</a>"  // Reset event listeners of parent node by recreating it
 
   var modifyButtonText = getAllElementsWithThisInnerTextValue("Modifier l’annonce")[2];
   modifyButtonText.setAttribute("class", "");
   modifyButtonText.style.color = "green";
   modifyButtonText.addEventListener("click", () => {
-    window.setTimeout(adDataBackup, 50);
-    window.setTimeout(photosBackup, 50);
+    window.setTimeout(adDataBackup, 1);
+    window.setTimeout(photosBackup, 1);
     window.open('https://www.leboncoin.fr/ai?ca=12_s'); // Opens a new tab to create a new ad
   });
 
