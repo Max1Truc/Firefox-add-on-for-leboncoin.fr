@@ -2,7 +2,7 @@
 // @description  Userscript pour charger une annonces Leboncoin
 // @author       Max1Truc
 
-var intervalID = setInterval(() => {
+var mainIntervalID = setInterval(() => {
   function selectCategory(category) {
     Array.from(document.getElementById("category").options).forEach((option) => {
       if (option.innerText == category) {
@@ -19,7 +19,7 @@ var intervalID = setInterval(() => {
 
   if (title_input != undefined && category_input != undefined && description_input != undefined && price_input != undefined)
     // Page fully loaded
-    clearInterval(intervalID);
+    clearInterval(mainIntervalID);
 
   if (object != null && title_input.value == "" && description_input.value == "" && price_input.value == "") {
     object = JSON.parse(object);
@@ -34,36 +34,46 @@ var intervalID = setInterval(() => {
     price_input.value = price;
 
     // Load the images
-    for (let image_id = 0; image_id < 3; image_id++) { // For each one of the three images
-      setTimeout(() => {
-        window.eval("(" + ((image_id) => { // Execute following code with window scope
-          function dataURLtoFile(dataurl, filename) { // Convert a data url to a File object (https://stackoverflow.com/a/30407840/9438168)
-            var arr = dataurl.split(','),
-              mime = arr[0].match(/:(.*?);/)[1],
-              bstr = atob(arr[1]),
-              n = bstr.length,
-              u8arr = new Uint8Array(n);
-            while (n--) {
-              u8arr[n] = bstr.charCodeAt(n);
-            }
-            return new File([u8arr], filename, {
-              type: mime
-            });
+    let image_id = 0;
+    var intervalID = setInterval(() => {
+      if (localStorage.getItem("image" + image_id) === undefined) {
+        // If there is no more image to upload
+        clearInterval(intervalID); // Stop the interval
+        return; // Stop the current iteration
+      }
+
+      image_id = window.eval("(" + ((image_id, intervalID) => { // Execute following code with window scope
+        if (runningInstanceOfFileUploadNewad != null && runningInstanceOfFileUploadNewad.state != 'uploaded')
+          return image_id; // Stop this iteration because an image is being uploaded
+
+        function dataURLtoFile(dataurl, filename) { // Convert a data url to a File object (https://stackoverflow.com/a/30407840/9438168)
+          var arr = dataurl.split(','),
+            mime = arr[0].match(/:(.*?);/)[1],
+            bstr = atob(arr[1]),
+            n = bstr.length,
+            u8arr = new Uint8Array(n);
+          while (n--) {
+            u8arr[n] = bstr.charCodeAt(n);
           }
+          return new File([u8arr], filename, {
+            type: mime
+          });
+        }
 
-          var dataurl = localStorage.getItem("image" + image_id);
-          // Programmatically upload a file to an <input type="file"> (https://stackoverflow.com/a/47172409/9438168)
-          const dT = new DataTransfer();
-          var file = dataURLtoFile(dataurl, "image.jpg");
+        var dataurl = localStorage.getItem("image" + image_id);
+        // Programmatically upload a file to an <input type="file"> (https://stackoverflow.com/a/47172409/9438168)
+        const dT = new DataTransfer();
+        var file = dataURLtoFile(dataurl, "image.jpg");
 
-          dT.items.add(file);
-          document.getElementById("image" + image_id).files = dT.files;
-          arrayOfFileUploadNewad[image_id].uploadStart("photo_upload_ajax", "verify", 300);
+        dT.items.add(file);
+        document.getElementById("image" + image_id).files = dT.files;
+        arrayOfFileUploadNewad[image_id].uploadStart("photo_upload_ajax", "verify", 300);
 
-          localStorage.removeItem("image" + image_id);
-        }).toString() + ")(" + image_id + ")");
-      }, (image_id) * 2500);
-    }
+        localStorage.removeItem("image" + image_id);
+
+        return image_id + 1; // Increase image id
+      }).toString() + ")(" + image_id + ", " + intervalID + ")");
+    }, 500);
 
     // Resets the save
     localStorage.removeItem("save");
