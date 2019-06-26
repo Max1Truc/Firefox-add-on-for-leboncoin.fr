@@ -9,7 +9,7 @@ C'est le code source de mon extension LeBonCoin qui permet de modifier une annon
 **English:**
 
 To modify or not to modify, that is the question.
-LeBonCoin think you should have to pay to modify an ad, this extension permit you to create a new copy of your ads without paying.
+LeBonCoin think you should have to pay to modify an ad, this extension permit you to create a new copy of your ads at no cost.
 
 ## How-to
 
