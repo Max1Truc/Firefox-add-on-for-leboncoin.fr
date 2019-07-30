@@ -41,9 +41,14 @@ var intervalId = setInterval(() => {
     }));
   }
 
-  function getDataURL(div, callback) {
+  function getDataURL(el, callback) {
     // Gets dataURL of an image (with the help of https://jsfiddle.net/handtrix/YvQ5y/4955)
-    var url = div.style.backgroundImage.split('("')[1].split('")')[0];
+
+    // Gets url of the image wether it's a <div> or an <img>
+    var url = el.style.backgroundImage
+        ?el.style.backgroundImage.split('("')[1].split('")')[0]
+        :el.src;
+
     var xhr = new XMLHttpRequest();
     xhr.onload = function() {
       var reader = new FileReader();
