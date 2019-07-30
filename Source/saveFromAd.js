@@ -60,6 +60,12 @@ var intervalId = setInterval(() => {
   function photosBackup() {
     // Backups the images
     var all_images = document.querySelectorAll('div[alt=""]');
+
+    if (all_images.length == 0)
+      // If there is only one image in the ad, we must
+      // use another way to get the url of the image
+      all_images = document.querySelectorAll('img[alt="image-galerie-0"]');
+
     for (let i = 0; i < all_images.length; i++) {
       getDataURL(all_images[i], (result) => localStorage.setItem("image" + i, result));
     };
