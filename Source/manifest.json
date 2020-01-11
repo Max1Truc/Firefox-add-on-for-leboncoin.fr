@@ -4,7 +4,9 @@
   "description": "Cette extension pour Firefox permet de modifier des annonces LeBonCoin.fr",
   "version": "2.4.1",
   "browser_action": {
-    "default_icon": "icon.svg"
+    "browser_style": true,
+    "default_icon": "icon.svg",
+    "default_popup": "popup.html"
   },
   "icons": {
     "32": "icon-32.png",
@@ -14,12 +16,10 @@
   },
   "permissions": [
     "activeTab",
-    "https://*.leboncoin.fr/ad-image/*"
+    "https://*.leboncoin.fr/ad-image/*",
+    "https://*.leboncoin.fr/*/*.htm/"
   ],
   "content_scripts": [{
-    "matches": ["https://www.leboncoin.fr/*/*.htm/"],
-    "js": ["saveFromAd.js"]
-  }, {
     "matches": ["https://www.leboncoin.fr/ai/form/*"],
     "js": ["loadInForm.js"]
   }]
