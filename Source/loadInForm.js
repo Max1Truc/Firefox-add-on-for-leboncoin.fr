@@ -4,8 +4,9 @@
 
 var mainIntervalID = setInterval(() => {
   function selectCategory(category) {
+    category = category.toUpperCase().replace(/É/g, "E")
     Array.from(document.getElementById("category").options).forEach((option) => {
-      if (option.innerText == category) {
+      if (option.innerText.toUpperCase() == category) {
         document.getElementById("category").selectedIndex = option.index;
       }
     });

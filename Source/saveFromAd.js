@@ -99,8 +99,6 @@ function ifOnLeboncoinAd(callback) {
     if (tabs[0].url.match(/https\:\/\/[a-z0-9]*\.leboncoin\.fr\/[a-zA-Z\-\_]*\/[0-9]*.htm/i)) {
       // URL is a LeBonCoin Ad page, like that: "https://www.leboncoin.fr/[category]/[some_numbers].htm/"
       callback()
-    } else {
-      alert("Vous n'êtes pas sur la bonne page.")
     }
   }).catch(console.error)
 }
