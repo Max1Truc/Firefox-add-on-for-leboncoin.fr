@@ -3,8 +3,13 @@
 // @author       Max1Truc
 
 var mainIntervalID = setInterval(() => {
+  function execWindow(func) {
+    let args = Array.from(arguments).slice(1).join(", ")
+    return window.eval("(" + func.toString() + ")(" + args + ")")
+  }
+
   function selectCategory(category) {
-    category = category.toUpperCase().replace(/É/g, "E")
+    category = category.replace(/É/g, "E").toUpperCase()
     Array.from(document.getElementById("category").options).forEach((option) => {
       if (option.innerText.toUpperCase() == category) {
         document.getElementById("category").selectedIndex = option.index;
@@ -34,6 +39,14 @@ var mainIntervalID = setInterval(() => {
     description_input.value = description;
     price_input.value = price;
 
+    // Correct some tweaks from LeBonCoin to redirect to another page
+    execWindow(() => {
+      document.getElementById("subject").setAttribute("maxlength", "100");
+      $._data($("body")[0], "events")["focusout"][2].handler = () => {};
+      $._data($("body")[0], "events")["focusin"][1].handler = () => {};
+      $._data($("body")[0], "events")["change"][0].handler = () => {};
+    });
+
     // Load the images
     let image_id = 0;
     var intervalID = setInterval(() => {
@@ -43,7 +56,7 @@ var mainIntervalID = setInterval(() => {
         return; // Stop the current iteration
       }
 
-      image_id = window.eval("(" + ((image_id, intervalID) => { // Execute following code with window scope
+      image_id = execWindow((image_id, intervalID) => { // Execute following code with window scope
         if (runningInstanceOfFileUploadNewad != null && runningInstanceOfFileUploadNewad.state != 'uploaded')
           return image_id; // Stop this iteration because an image is being uploaded
 
@@ -73,7 +86,7 @@ var mainIntervalID = setInterval(() => {
         localStorage.removeItem("image" + image_id);
 
         return image_id + 1; // Increase image id
-      }).toString() + ")(" + image_id + ", " + intervalID + ")");
+      }, image_id, intervalID);
     }, 500);
 
     // Resets the save
