@@ -88,7 +88,7 @@ function injectedCode() {
 
 function execute(functionVar) {
   browser.tabs.executeScript({
-    code: "(" + functionVar.toSource() + ")()"
+    code: "(" + functionVar.toString() + ")()"
   });
 }
 
