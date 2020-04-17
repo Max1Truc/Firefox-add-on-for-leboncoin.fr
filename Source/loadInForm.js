@@ -28,18 +28,19 @@ var mainIntervalID = setInterval(() => {
     });
   }
 
-  var object = localStorage.getItem('save');
+  var objectStr = localStorage.getItem('save');
   var title_input = document.getElementById("subject"),
     category_input = document.getElementById("category"),
     description_input = document.getElementById("body"),
     price_input = document.getElementById("price");
 
-  if (title_input != undefined && category_input != undefined && description_input != undefined && price_input != undefined)
+  if (title_input && category_input && description_input && price_input) {
     // Page fully loaded
     clearInterval(mainIntervalID);
+  }
 
-  if (object != null && title_input.value == "" && description_input.value == "" && price_input.value == "") {
-    object = JSON.parse(object);
+  if (objectStr != null && title_input.value == "" && description_input.value == "" && price_input.value == "") {
+    object = JSON.parse(objectStr);
     var title = object.title,
       category = object.category,
       description = object.description,
@@ -50,19 +51,6 @@ var mainIntervalID = setInterval(() => {
     description_input.value = description;
     price_input.value = price;
 
-    // Input location
-    var location_input = getAllElementsWithAttributeValue("name", "location_p"),
-        zipcode = getAllElementsWithAttributeValue("name", "zipcode"),
-        city = getAllElementsWithAttributeValue("name", "city"),
-        region = getAllElementsWithAttributeValue("name", "region"),
-        dpt_code = getAllElementsWithAttributeValue("name", "dpt_code")
-
-    location_input.value = object.location.city_label;
-    zipcode.value = object.location.zipcode;
-    city.value = object.location.city;
-    region.value = object.location.region_id;
-    dpt_code = object.location.department_id;
-
     // Correct some tweaks from LeBonCoin to redirect to another page
     execWindow(() => {
       document.getElementById("subject").setAttribute("maxlength", "100");
@@ -70,6 +58,21 @@ var mainIntervalID = setInterval(() => {
       $._data($("body")[0], "events")["focusin"][1].handler = () => {};
       $._data($("body")[0], "events")["change"][0].handler = () => {};
     });
+
+    // Input location
+    execWindow((getAllElementsWithAttributeValue, object) => {
+      var location_input = getAllElementsWithAttributeValue("name", "location_p")[0],
+        zipcode = getAllElementsWithAttributeValue("name", "zipcode")[0],
+        city = getAllElementsWithAttributeValue("name", "city")[0],
+        region = getAllElementsWithAttributeValue("name", "region")[0],
+        dpt_code = getAllElementsWithAttributeValue("name", "dpt_code")[0];
+
+      location_input.value = object.location.city_label;
+      zipcode.value = object.location.zipcode;
+      city.value = object.location.city;
+      region.value = object.location.region_id;
+      dpt_code.value = object.location.department_id;
+    }, getAllElementsWithAttributeValue.toString(), objectStr);
 
     // Load the images
     let image_id = 0;
