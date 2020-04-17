@@ -8,6 +8,17 @@ var mainIntervalID = setInterval(() => {
     return window.eval("(" + func.toString() + ")(" + args + ")")
   }
 
+  function getAllElementsWithAttributeValue(attribute, value) {
+    var matchingElements = [];
+    var allElements = document.getElementsByTagName('*');
+    for (var i = 0, n = allElements.length; i < n; i++) {
+      if (allElements[i].getAttribute(attribute) == value) {
+        matchingElements.push(allElements[i]);
+      }
+    }
+    return matchingElements;
+  }
+
   function selectCategory(category) {
     category = category.replace(/É/g, "E").toUpperCase()
     Array.from(document.getElementById("category").options).forEach((option) => {
@@ -32,12 +43,25 @@ var mainIntervalID = setInterval(() => {
     var title = object.title,
       category = object.category,
       description = object.description,
-      price = object.price.replace(" \u20AC", ""); // Removes "€"
+      price = object.price;
 
     title_input.value = title;
     selectCategory(category);
     description_input.value = description;
     price_input.value = price;
+
+    // Input location
+    var location_input = getAllElementsWithAttributeValue("name", "location_p"),
+        zipcode = getAllElementsWithAttributeValue("name", "zipcode"),
+        city = getAllElementsWithAttributeValue("name", "city"),
+        region = getAllElementsWithAttributeValue("name", "region"),
+        dpt_code = getAllElementsWithAttributeValue("name", "dpt_code")
+
+    location_input.value = object.location.city_label;
+    zipcode.value = object.location.zipcode;
+    city.value = object.location.city;
+    region.value = object.location.region_id;
+    dpt_code = object.location.department_id;
 
     // Correct some tweaks from LeBonCoin to redirect to another page
     execWindow(() => {
