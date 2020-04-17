@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Copie d'annonces LeBonCoin.fr",
   "description": "Cette extension pour Firefox permet de modifier des annonces LeBonCoin.fr",
-  "version": "2.5.3",
+  "version": "2.5.4",
   "browser_action": {
     "browser_style": true,
     "default_icon": "icon.svg",

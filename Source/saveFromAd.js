@@ -8,8 +8,11 @@ function injectedCode() {
       var all = document.getElementsByTagName("*");
       var list = [];
       for (let x in all) {
-        if (all[x].innerText == value) {
-          list.push(all[x]);
+        if (all[x].innerText) {
+          let match = all[x].innerText.match(value);
+          if (match && match.length > 0) {
+            list.push(all[x]);
+          }
         }
       }
 
@@ -32,7 +35,7 @@ function injectedCode() {
       var title = document.getElementsByTagName("h1")[0].innerText,
         category = getAllElementsWithAttributeValue("data-qa-id", "breadcrumb-item-2")[0].innerText,
         description = getAllElementsWithAttributeValue("data-qa-id", "adview_description_container")[0].children[0].innerText,
-        price = document.getElementsByClassName("_1F5u3")[0].innerText;
+        price = getAllElementsWithThisInnerTextValue(/^[0-9]+ €$/).pop().innerText;
 
       localStorage.setItem("save", JSON.stringify({
         title,
@@ -84,16 +87,20 @@ function injectedCode() {
     // If this interval is finished, it disallows other iterations of this interval to repatch the page and prevents bugs.
     clearInterval(intervalId);
   }, 500);
+  return intervalId;
 }
 
 function execute(functionVar) {
   browser.tabs.executeScript({
     code: "(" + functionVar.toString() + ")()"
-  });
+  }).then(console.dir, console.error);
 }
 
 function ifOnLeboncoinAd(callback) {
-  browser.tabs.query({currentWindow: true, active: true}).then((tabs) => {
+  browser.tabs.query({
+    currentWindow: true,
+    active: true
+  }).then((tabs) => {
     if (tabs.length < 1) return; // We do not have the permission to look at the current website
 
     if (tabs[0].url.match(/https\:\/\/[a-z0-9]*\.leboncoin\.fr\/[a-zA-Z\-\_]*\/[0-9]*.htm/i)) {
