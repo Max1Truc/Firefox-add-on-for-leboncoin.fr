@@ -35,7 +35,7 @@ function injectedCode() {
       var title = document.getElementsByTagName("h1")[0].innerText,
         category = getAllElementsWithAttributeValue("data-qa-id", "breadcrumb-item-2")[0].innerText,
         description = getAllElementsWithAttributeValue("data-qa-id", "adview_description_container")[0].children[0].innerText,
-        price = getAllElementsWithThisInnerTextValue(/^[0-9]+ €$/).pop().innerText;
+        price = getAllElementsWithThisInnerTextValue(/^[0-9]+ €$/)[0].innerText;
 
       localStorage.setItem("save", JSON.stringify({
         title,
