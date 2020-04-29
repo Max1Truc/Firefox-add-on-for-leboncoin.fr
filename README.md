@@ -17,14 +17,14 @@ LeBonCoin think you should have to pay to modify an ad, this extension permit yo
 
 1.  Allez sur la page de l'une de vos annonces
 
-2.  Cliquez sur le logo de l'extension en haut à droite de la fenêtre de l'extension
+2.  Cliquez sur le logo de l'extension en haut à droite de la fenêtre de Firefox
 
-3.  Vous n'avez plus qu'à modifier l'annonce et à supprimer l'ancienne
+3.  Vous n'avez plus qu'à modifier la copie de l'annonce et à supprimer l'ancienne
 
 **English:**
 
 1.  Go to the page of one of your ads
 
-3.  Click on the button of the add-on on the top right corner
+3.  Click on the button of the add-on on the top right corner of Firefox
 
 4.  You can now modify the new ad and delete the old one.
