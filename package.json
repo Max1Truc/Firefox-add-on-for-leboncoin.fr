@@ -4,8 +4,8 @@
   "description": "It creates a ZIP with the source of the add-on.",
   "main": "build.js",
   "scripts": {
-    "start": "node build.js",
-    "build": "node build.js",
+    "start": "web-ext run -s ./Source/ -u \"https://www.leboncoin.fr/\"",
+    "build": "web-ext build -s ./Source/",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -16,6 +16,6 @@
   "license": "MIT",
   "homepage": "https://github.com/Max1Truc/Firefox-add-on-for-leboncoin.fr#readme",
   "dependencies": {
-    "archiver": "^2.1.1"
+    "web-ext": "^4.2.0"
   }
 }
