@@ -1,9 +1,5 @@
 # Node files
 node_modules
-package-lock.json
-
-# Build file
-Source.zip
 
 # web-ext build artifacts
 web-ext-artifacts/*
