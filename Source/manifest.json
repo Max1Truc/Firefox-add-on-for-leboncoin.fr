@@ -19,7 +19,7 @@
     "https://*.leboncoin.fr/*"
   ],
   "content_scripts": [{
-    "matches": ["https://www.leboncoin.fr/ai/form/*"],
+    "matches": ["https://www.leboncoin.fr/deposer-une-annonce/"],
     "js": ["loadInForm.js"]
   }]
 }
