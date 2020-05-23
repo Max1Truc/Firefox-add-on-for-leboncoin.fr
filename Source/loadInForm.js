@@ -35,7 +35,7 @@ function fillNewAd() {
     el.dispatchEvent(focus);
 
     if (el.nodeName.toLowerCase() == "textarea") {
-      setTextareaValue?.call(el, value);
+      setTextareaValue.call(el, value);
     } else {
       setInputValue.call(el, value);
     }
