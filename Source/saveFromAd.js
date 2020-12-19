@@ -2,14 +2,21 @@
 // @description  Userscript pour enregistrer une annonce Leboncoin
 // @author       Max1Truc
 
-function injectedCode() {
-  var adData = JSON.parse(document.getElementById("__NEXT_DATA__").innerText)
-    .props.pageProps.ad;
+async function injectedCode() {
+  const ad_path_splitted = window.location.href.split("/");
+  const ad_id = ad_path_splitted[ad_path_splitted.length - 1].split(".")[0];
+  var adData = await (
+    await fetch("https://api.leboncoin.fr/finder/classified/" + ad_id)
+  ).json();
 
   let condition = undefined;
   for (let attribute of adData.attributes) {
     if (attribute.key == "condition") {
       condition = attribute.value_label;
+    } else if (attribute.key == "estimated_parcel_weight") {
+      adData["estimated_parcel_weight"] = attribute.value;
+    } else if (attribute.key == "toy_age") {
+      adData["toy_age"] = attribute.value;
     }
   }
 
@@ -24,20 +31,13 @@ function injectedCode() {
         price: adData.price[0],
         location: adData.location,
         condition,
+        estimated_parcel_weight: adData["estimated_parcel_weight"],
       })
     );
   }
 
-  function getDataURL(el, callback) {
+  function getDataURL(url, callback) {
     // Gets dataURL of an image (with the help of https://jsfiddle.net/handtrix/YvQ5y/4955)
-
-    // Gets url of the image wether it's a <div> or an <img>
-    var url = el.style.backgroundImage
-      ? el.style.backgroundImage.split('("')[1].split('")')[0]
-      : el.src;
-
-    url = url.replace("ad-image", "ad-large");
-
     var xhr = new XMLHttpRequest();
     xhr.onload = function () {
       var reader = new FileReader();
@@ -53,12 +53,7 @@ function injectedCode() {
 
   function photosBackup() {
     // Backups the images
-    var all_images = document.querySelectorAll('div[alt=""]');
-
-    if (all_images.length == 0)
-      // If there is only one image in the ad, we must
-      // use another way to get the url of the image
-      all_images = document.querySelectorAll('img[alt="image-galerie-0"]');
+    var all_images = adData["images"]["urls_large"];
 
     for (let i = 0; i < all_images.length; i++) {
       getDataURL(all_images[i], (result) =>
@@ -81,17 +76,16 @@ function execute(func) {
     .executeScript({
       code: "(" + func.toString() + ")(" + args + ")",
     })
-    .then(console.dir, console.error);
+    .then(console.dir)
+    .catch(console.error);
 }
 
 function ifOnLeboncoinAd(callback) {
   browser.tabs
-    .query({
-      currentWindow: true,
-      active: true,
-    })
+    .query({ currentWindow: true, active: true })
     .then((tabs) => {
-      if (tabs.length < 1) return; // We do not have the permission to look at the current website
+      if (tabs.length < 1) return;
+      // We do not have the permission to look at the current website
 
       if (
         tabs[0].url.match(

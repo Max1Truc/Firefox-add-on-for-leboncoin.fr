@@ -13,7 +13,10 @@
    id="svg64"
    version="1.1"
    sodipodi:docname="icon.svg"
-   inkscape:version="0.92.3 (2405546, 2018-03-11)">
+   inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)"
+   inkscape:export-filename="/home/bela/Documents/lbc/Source/icon-64.png"
+   inkscape:export-xdpi="25.6"
+   inkscape:export-ydpi="25.6">
   <sodipodi:namedview
      pagecolor="#ffffff"
      bordercolor="#666666"
@@ -23,17 +26,18 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="640"
-     inkscape:window-height="480"
+     inkscape:window-width="1920"
+     inkscape:window-height="1015"
      id="namedview11"
      showgrid="false"
-     inkscape:zoom="0.98333333"
-     inkscape:cx="120"
-     inkscape:cy="120"
+     inkscape:zoom="1.9666667"
+     inkscape:cx="52.547111"
+     inkscape:cy="131.50484"
      inkscape:window-x="0"
      inkscape:window-y="0"
-     inkscape:window-maximized="0"
-     inkscape:current-layer="svg64" />
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg64"
+     inkscape:document-rotation="0" />
   <metadata
      id="metadata70">
     <rdf:RDF>
@@ -75,4 +79,8 @@
          style="fill:none;stroke:#ffffff;stroke-width:10;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     </g>
   </g>
+  <path
+     style="fill:#ffffff;stroke-width:1.06846"
+     d="m 78.159784,190.73216 -40.005086,-22.67704 0.621704,-39.51947 c 0.595541,-37.856273 1.234318,-53.003443 2.23523,-53.003443 0.254679,0 17.997289,10.43399 39.42802,23.186646 l 38.964968,23.186637 -0.41743,44.50289 c -0.22958,24.47658 -0.50853,45.06492 -0.61987,45.75187 -0.11135,0.68693 -18.20474,-8.9557 -40.207536,-21.42809 z"
+     id="path104" />
 </svg>

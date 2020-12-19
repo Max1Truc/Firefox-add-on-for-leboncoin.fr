@@ -13,11 +13,23 @@ function fillNewAd() {
   ];
 
   function wait(time) {
-    return () => {
-      return new Promise((resolve, _reject) => {
-        setTimeout(resolve, time);
-      });
-    };
+    return new Promise((resolve, _reject) => {
+      setTimeout(resolve, time);
+    });
+  }
+
+  function simulateMouseClick(element) {
+    const mouseClickEvents = ["mousedown", "click", "mouseup"];
+    mouseClickEvents.forEach((mouseEventType) =>
+      element.dispatchEvent(
+        new MouseEvent(mouseEventType, {
+          view: window,
+          bubbles: true,
+          cancelable: true,
+          buttons: 1,
+        })
+      )
+    );
   }
 
   function type(el, value) {
@@ -40,16 +52,10 @@ function fillNewAd() {
       setInputValue.call(el, value);
     }
 
-    var textinput = new InputEvent("input", {
-      bubbles: true,
-    });
+    var textinput = new InputEvent("input", { bubbles: true });
     el.dispatchEvent(textinput);
 
-    el.dispatchEvent(
-      new FocusEvent("blur", {
-        bubbles: true,
-      })
-    );
+    el.dispatchEvent(new FocusEvent("blur", { bubbles: true }));
   }
 
   function getAllElementsWithAttributeValue(attribute, value) {
@@ -82,9 +88,7 @@ function fillNewAd() {
     while (n--) {
       u8arr[n] = bstr.charCodeAt(n);
     }
-    return new File([u8arr], filename, {
-      type: mime,
-    });
+    return new File([u8arr], filename, { type: mime });
   }
 
   function uploadImageFromDataURL(fileInputElement, dataurl) {
@@ -119,7 +123,7 @@ function fillNewAd() {
           "data-qa-id",
           "button__research"
         )[0];
-        confirmTitleButton.click();
+        if (confirmTitleButton) confirmTitleButton.click();
 
         setTimeout(() => {
           // 1 second
@@ -127,7 +131,15 @@ function fillNewAd() {
             "data-test-id",
             "item-default"
           )[0];
-          otherCategoryLink.click();
+          if (otherCategoryLink) {
+            otherCategoryLink.click();
+          } else {
+            var chooseCategoryLink = getAllElementsWithAttributeValue(
+              "data-qa-id",
+              "newad-select_category"
+            )[0];
+            chooseCategoryLink.click();
+          }
 
           var categoryElement =
             subjectInput.parentElement.parentElement.parentElement.parentElement
@@ -148,10 +160,6 @@ function fillNewAd() {
                     "list"
                   )
                   .then(() => {
-                    // Click on "Continue"
-                    let continueButton = getAllElementsWithAttributeValue("data-qa-id", "newad-button-next-categories")[0];
-                    continueButton.click();
-
                     // Resolve the promise
                     setTimeout(resolve, 500);
                   });
@@ -159,10 +167,10 @@ function fillNewAd() {
             }
           }
           /*
-      reactElement.setState({
-        toggleSelect: false,
-      });
-      */
+          reactElement.setState({
+            toggleSelect: false,
+          });
+          */
         }, 1000);
       }, 500);
     });
@@ -170,24 +178,59 @@ function fillNewAd() {
 
   function conditionStep() {
     return new Promise((resolve, _reject) => {
-      // We don't know the item's condition
-      // So we can't provide it.
-      //var conditionSelect = document.getElementsByName("item_condition")[0];
-      //select(conditionSelect, "État neuf");
+      // Toy age
+      /*var toyAgeElement = getAllElementsWithAttributeValue(
+        "data-qa-id",
+        "newad-input_toy_age"
+      )[0];
+      if (toyAgeElement && adData["toy_age"]) {
+        let toyAgeReactInstance =
+          toyAgeElement[Object.keys(toyAgeElement)[0]]._currentElement._owner
+            ._instance;
+        toyAgeReactInstance.props.value = parseInt(adData["toy_age"]);
+        setTimeout(() => toyAgeReactInstance.forceUpdate(), 100);
+      }*/
 
       setTimeout(() => {
-        // 0.2 second
-        var continueButton = getAllElementsWithAttributeValue(
+        // Item Condition
+        var conditionElement = getAllElementsWithAttributeValue(
           "data-qa-id",
-          "newad-button-next-ad_params"
+          "newad-input_item_condition"
         )[0];
+        if (conditionElement && adData.condition) {
+          conditionElement.click();
 
-        // Some categories do not allow a "condition" option,
-        // And in those cases the view with this continue
-        //   button isn't shown.
-        if (continueButton) continueButton.click();
+          setTimeout(() => {
+            const all_options = getAllElementsWithAttributeValue(
+              "name",
+              "item_condition"
+            );
 
-        setTimeout(resolve, 500);
+            for (let option of all_options) {
+              if (
+                option.parentElement.parentElement.innerText == adData.condition
+              ) {
+                option.click();
+                break;
+              }
+            }
+          }, 200);
+        }
+
+        setTimeout(() => {
+          // 0.2 second
+          var continueButton = getAllElementsWithAttributeValue(
+            "data-qa-id",
+            "newad-button-next-ad_params"
+          )[0];
+
+          // Some categories do not allow a "condition" option,
+          // And in those cases the view with this continue
+          // button isn't shown.
+          if (continueButton) continueButton.click();
+
+          setTimeout(resolve, 500);
+        }, 200);
       }, 200);
     });
   }
@@ -238,14 +281,17 @@ function fillNewAd() {
 
   function deliveryStep() {
     return new Promise((resolve, _reject) => {
-      let noDeliveryButton = getAllElementsWithAttributeValue(
-        "data-test-id",
-        "option-title-text"
-      ).pop();
-      noDeliveryButton.click();
+      let estimated_weight_select = getAllElementsWithAttributeValue(
+        "data-qa-id",
+        "newad-input_estimated_parcel_weight"
+      )[0];
+      let reactElement =
+        estimated_weight_select[Object.keys(estimated_weight_select)[0]]
+          ._currentElement._owner._instance;
+      reactElement.props.value = parseInt(adData["estimated_parcel_weight"]);
+      reactElement.forceUpdate();
 
       setTimeout(() => {
-        // 0.2 second
         let continueButton = getAllElementsWithAttributeValue(
           "data-qa-id",
           "newad-button-next-shipping"
@@ -253,12 +299,18 @@ function fillNewAd() {
         continueButton.click();
 
         setTimeout(resolve, 500);
-      }, 200);
+      }, 500);
     });
   }
 
   function imageUploadStep() {
     return new Promise((resolve, _reject) => {
+      // Remove already-uploaded images
+      while (getAllElementsWithAttributeValue("name", "close").length > 0) {
+        getAllElementsWithAttributeValue("name", "close")[0].click();
+      }
+
+      // Upload ad images
       for (let image of images) {
         if (image) {
           let fileInput = getAllElementsWithAttributeValue("type", "file")[0],
@@ -267,7 +319,10 @@ function fillNewAd() {
               "false"
             )[0];
           let dataTransfer = uploadImageFromDataURL(fileInput, image);
-          var drop = new DragEvent("drop", { bubbles: true, dataTransfer });
+          var drop = new DragEvent("drop", {
+            bubbles: true,
+            dataTransfer,
+          });
           imageInput.dispatchEvent(drop);
         }
       }
@@ -304,6 +359,7 @@ function fillNewAd() {
             "data-qa-id",
             "newad-button-next-undefined"
           )[0];
+          // First click (to de-focus from the address bar)
           continueButton.click();
 
           setTimeout(() => {
