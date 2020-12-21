@@ -285,11 +285,13 @@ function fillNewAd() {
         "data-qa-id",
         "newad-input_estimated_parcel_weight"
       )[0];
-      let reactElement =
-        estimated_weight_select[Object.keys(estimated_weight_select)[0]]
-          ._currentElement._owner._instance;
-      reactElement.props.value = parseInt(adData["estimated_parcel_weight"]);
-      reactElement.forceUpdate();
+      if (estimated_weight_select) {
+        let reactElement =
+          estimated_weight_select[Object.keys(estimated_weight_select)[0]]
+            ._currentElement._owner._instance;
+        reactElement.props.value = parseInt(adData["estimated_parcel_weight"]);
+        reactElement.forceUpdate();
+      }
 
       setTimeout(() => {
         let continueButton = getAllElementsWithAttributeValue(
