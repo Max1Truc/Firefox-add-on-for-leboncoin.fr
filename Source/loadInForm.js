@@ -3,14 +3,23 @@ function execWindow(func) {
   return window.eval("(" + func.toString() + ")(" + args + ")");
 }
 
-function fillNewAd() {
-  let adData = JSON.parse(localStorage.getItem("save"));
+async function fillNewAd() {
+  const ad_id = Number(document.location.hash.slice(1));
+  if (ad_id == 0) return;
 
-  let images = [
-    localStorage.getItem("image0"),
-    localStorage.getItem("image1"),
-    localStorage.getItem("image2"),
-  ];
+  var adData = await (
+    await fetch("https://api.leboncoin.fr/finder/classified/" + ad_id)
+  ).json();
+
+  for (let attribute of adData.attributes) {
+    if (attribute.key == "condition") {
+      adData.condition = attribute.value_label;
+    } else if (attribute.key == "estimated_parcel_weight") {
+      adData["estimated_parcel_weight"] = attribute.value;
+    } else if (attribute.key == "toy_age") {
+      adData["toy_age"] = attribute.value;
+    }
+  }
 
   function wait(time) {
     return new Promise((resolve, _reject) => {
@@ -78,6 +87,23 @@ function fillNewAd() {
     });
   }
 
+  function getDataURL(url) {
+    return new Promise((resolve, reject) => {
+      // Gets dataURL of an image (with the help of https://jsfiddle.net/handtrix/YvQ5y/4955)
+      var xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        var reader = new FileReader();
+        reader.onloadend = function () {
+          resolve(reader.result);
+        };
+        reader.readAsDataURL(xhr.response);
+      };
+      xhr.open("GET", url);
+      xhr.responseType = "blob";
+      xhr.send();
+    });
+  }
+
   function dataURLtoFile(dataurl, filename) {
     // Convert a data url to a File object (https://stackoverflow.com/a/30407840/9438168)
     var arr = dataurl.split(","),
@@ -115,7 +141,7 @@ function fillNewAd() {
   function titleAndCategoryStep() {
     return new Promise((resolve, _reject) => {
       var subjectInput = document.getElementsByName("subject")[0];
-      type(subjectInput, adData.title);
+      type(subjectInput, adData.subject);
 
       setTimeout(() => {
         // 0.5 second
@@ -151,7 +177,7 @@ function fillNewAd() {
           // Select Category
           for (let category of reactElement.props.categories) {
             for (let subcategory of category.subcategories) {
-              if (subcategory.name == adData.category) {
+              if (subcategory.name == adData.category_name) {
                 reactElement
                   .selectCategory(
                     category.id,
@@ -242,7 +268,7 @@ function fillNewAd() {
         "newad-text_body"
       )[0];
 
-      type(descriptionTextarea, adData.description);
+      type(descriptionTextarea, adData.body);
 
       setTimeout(() => {
         // 0.2 second
@@ -264,7 +290,7 @@ function fillNewAd() {
         "newad-input_price"
       )[0];
 
-      type(priceInput, adData.price);
+      type(priceInput, adData.price[0]);
 
       setTimeout(() => {
         // 0.2 second
@@ -306,27 +332,26 @@ function fillNewAd() {
   }
 
   function imageUploadStep() {
-    return new Promise((resolve, _reject) => {
+    return new Promise(async (resolve, _reject) => {
       // Remove already-uploaded images
       while (getAllElementsWithAttributeValue("name", "close").length > 0) {
         getAllElementsWithAttributeValue("name", "close")[0].click();
       }
 
       // Upload ad images
-      for (let image of images) {
-        if (image) {
-          let fileInput = getAllElementsWithAttributeValue("type", "file")[0],
-            imageInput = getAllElementsWithAttributeValue(
-              "aria-disabled",
-              "false"
-            )[0];
-          let dataTransfer = uploadImageFromDataURL(fileInput, image);
-          var drop = new DragEvent("drop", {
-            bubbles: true,
-            dataTransfer,
-          });
-          imageInput.dispatchEvent(drop);
-        }
+      for (var image_url of adData["images"]["urls_large"]) {
+        let image_base64 = await getDataURL(image_url);
+        let fileInput = getAllElementsWithAttributeValue("type", "file")[0],
+          imageInput = getAllElementsWithAttributeValue(
+            "aria-disabled",
+            "false"
+          )[0];
+        let dataTransfer = uploadImageFromDataURL(fileInput, image_base64);
+        var drop = new DragEvent("drop", {
+          bubbles: true,
+          dataTransfer,
+        });
+        imageInput.dispatchEvent(drop);
       }
 
       setTimeout(() => {
@@ -384,14 +409,14 @@ function fillNewAd() {
   }
 
   return waitPageLoad()
+    .then(clearLocalStorage)
     .then(titleAndCategoryStep)
     .then(conditionStep)
     .then(descriptionStep)
     .then(priceStep)
     .then(deliveryStep)
     .then(imageUploadStep)
-    .then(addressInputStep)
-    .then(clearLocalStorage);
+    .then(addressInputStep);
 }
 
 execWindow(fillNewAd);
