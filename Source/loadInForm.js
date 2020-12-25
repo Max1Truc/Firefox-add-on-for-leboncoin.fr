@@ -27,6 +27,17 @@ async function fillNewAd() {
     });
   }
 
+  function waitUntil(callback) {
+    return new Promise((resolve, _reject) => {
+      var intervalId = setInterval(() => {
+        if (callback()) {
+          clearInterval(intervalId);
+          resolve();
+        }
+      }, 200);
+    });
+  }
+
   function simulateMouseClick(element) {
     const mouseClickEvents = ["mousedown", "click", "mouseup"];
     mouseClickEvents.forEach((mouseEventType) =>
@@ -408,15 +419,26 @@ async function fillNewAd() {
     localStorage.removeItem("image2");
   }
 
-  return waitPageLoad()
-    .then(clearLocalStorage)
-    .then(titleAndCategoryStep)
-    .then(conditionStep)
-    .then(descriptionStep)
-    .then(priceStep)
-    .then(deliveryStep)
-    .then(imageUploadStep)
-    .then(addressInputStep);
+  function ifConnected(callback) {
+    let connectButton = getAllElementsWithAttributeValue(
+      "data-qa-id",
+      "new_depository::login"
+    )[0];
+    if (connectButton === undefined) callback();
+  }
+
+  return waitPageLoad().then(
+    ifConnected(async () => {
+      await clearLocalStorage();
+      await titleAndCategoryStep();
+      await conditionStep();
+      await descriptionStep();
+      await priceStep();
+      await deliveryStep();
+      await imageUploadStep();
+      await addressInputStep();
+    })
+  );
 }
 
 execWindow(fillNewAd);

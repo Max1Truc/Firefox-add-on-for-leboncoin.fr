@@ -2,8 +2,18 @@
 // @description  Userscript pour enregistrer une annonce Leboncoin
 // @author       Max1Truc
 
-function openNewAdPage(url) {
-  const ad_path_splitted = url.split("/");
+function execute(func) {
+  let args = Array.from(arguments).slice(1).join(", ");
+  browser.tabs
+    .executeScript({
+      code: "(" + func.toString() + ")(" + args + ")",
+    })
+    .then(console.dir)
+    .catch(console.error);
+}
+
+function openNewAdPage() {
+  const ad_path_splitted = window.location.href.split("/");
   const ad_id = ad_path_splitted[ad_path_splitted.length - 1].split(".")[0];
   window.open("https://www.leboncoin.fr/deposer-une-annonce/#" + ad_id);
 }
@@ -28,6 +38,6 @@ function ifOnLeboncoinAd(callback) {
 }
 
 ifOnLeboncoinAd((url) => {
-  openNewAdPage(url);
+  execute(openNewAdPage);
   window.close();
 });
