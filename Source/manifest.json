@@ -1,26 +1,27 @@
 {
-    "manifest_version": 2,
-    "name": "Copie d'annonces LeBonCoin.fr",
-    "description": "Cette extension pour Firefox permet de modifier des annonces LeBonCoin.fr",
-    "version": "3.0.7",
-    "browser_action": {
-        "browser_style": true,
-        "default_icon": "icon.svg",
-        "default_popup": "popup.html"
-    },
-    "icons": {
-        "32": "icon-32.png",
-        "48": "icon-48.png",
-        "64": "icon-64.png",
-        "96": "icon-96.png"
-    },
-    "permissions": [
-        "activeTab", "https://*.leboncoin.fr/*"
-    ],
-    "content_scripts": [
-        {
-            "matches": ["https://www.leboncoin.fr/deposer-une-annonce/"],
-            "js": ["loadInForm.js"]
-        }
-    ]
+  "manifest_version": 2,
+  "name": "Copie d'annonces LeBonCoin.fr",
+  "description": "Cette extension pour Firefox permet de modifier des annonces LeBonCoin.fr",
+  "version": "3.0.8",
+  "browser_action": {
+    "browser_style": true,
+    "default_icon": "icon.svg",
+    "default_popup": "popup.html"
+  },
+  "icons": {
+    "32": "icon-32.png",
+    "48": "icon-48.png",
+    "64": "icon-64.png",
+    "96": "icon-96.png"
+  },
+  "permissions": ["activeTab", "https://*.leboncoin.fr/*"],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.leboncoin.fr/deposer-une-annonce/",
+        "https://www.leboncoin.fr/deposer-une-annonce"
+      ],
+      "js": ["loadInForm.js"]
+    }
+  ]
 }

@@ -16,6 +16,6 @@
   "license": "MIT",
   "homepage": "https://github.com/Max1Truc/Firefox-add-on-for-leboncoin.fr#readme",
   "dependencies": {
-    "web-ext": "^4.3.0"
+    "web-ext": "^5.5.0"
   }
 }
