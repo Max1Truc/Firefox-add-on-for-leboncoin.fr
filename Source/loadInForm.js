@@ -38,6 +38,10 @@ async function fillNewAd() {
     });
   }
 
+  function waitWhile(callback) {
+    return waitUntil(() => !callback());
+  }
+
   function simulateMouseClick(element) {
     const mouseClickEvents = ["mousedown", "click", "mouseup"];
     mouseClickEvents.forEach((mouseEventType) =>
@@ -150,8 +154,14 @@ async function fillNewAd() {
   }
 
   function titleAndCategoryStep() {
-    return new Promise((resolve, _reject) => {
+    return new Promise(async (resolve, _reject) => {
       var subjectInput = document.getElementsByName("subject")[0];
+
+      if (!subjectInput) {
+        setTimeout(titleAndCategoryStep, 200);
+        return;
+      }
+
       type(subjectInput, adData.subject);
 
       setTimeout(() => {
@@ -178,36 +188,61 @@ async function fillNewAd() {
             chooseCategoryLink.click();
           }
 
-          var categoryElement =
-            subjectInput.parentElement.parentElement.parentElement.parentElement
-              .parentElement.parentElement.nextSibling;
-          var reactElement =
-            categoryElement[Object.keys(categoryElement)[0]]._currentElement
-              ._owner._instance;
+          setTimeout(async () => {
+            var categoryElement =
+              subjectInput.parentElement.parentElement.parentElement
+                .parentElement.parentElement.parentElement.nextSibling;
+            var reactElement =
+              categoryElement[Object.keys(categoryElement)[0]]._currentElement
+                ._owner._instance;
 
-          // Select Category
-          for (let category of reactElement.props.categories) {
-            for (let subcategory of category.subcategories) {
-              if (subcategory.name == adData.category_name) {
-                reactElement
-                  .selectCategory(
-                    category.id,
-                    subcategory.id,
-                    subcategory.name,
-                    "list"
-                  )
-                  .then(() => {
-                    // Resolve the promise
-                    setTimeout(resolve, 500);
-                  });
+            /*
+            reactElement.props.isPro = true;
+            reactElement.forceUpdate();
+            */
+            reactElement.state.items.splice(1);
+
+            // Select Category
+            for (let category of reactElement.props.categories) {
+              for (let subcategory of category.subcategories) {
+                if (subcategory.name == adData.category_name) {
+                  reactElement
+                    .selectCategory(
+                      category.id,
+                      subcategory.id,
+                      subcategory.name,
+                      "list"
+                    )
+                    .then(() => {
+                      /*
+                      reactElement.props.isPro = false;
+                      reactElement.forceUpdate();
+                      */
+
+                      // Wait for click on continue
+                      setTimeout(async () => {
+                        let button = getAllElementsWithAttributeValue(
+                          "data-qa-id",
+                          "newad-button-next-categories"
+                        )[0];
+
+                        await waitUntil(
+                          () => button.getAttribute("disabled") !== null
+                        );
+
+                        // Resolve the promise
+                        setTimeout(resolve, 200);
+                      }, 200);
+                    });
+                }
               }
             }
-          }
-          /*
+            /*
           reactElement.setState({
             toggleSelect: false,
           });
           */
+          }, 200);
         }, 1000);
       }, 500);
     });
@@ -254,7 +289,7 @@ async function fillNewAd() {
           }, 200);
         }
 
-        setTimeout(() => {
+        setTimeout(async () => {
           // 0.2 second
           var continueButton = getAllElementsWithAttributeValue(
             "data-qa-id",
@@ -264,7 +299,10 @@ async function fillNewAd() {
           // Some categories do not allow a "condition" option,
           // And in those cases the view with this continue
           // button isn't shown.
-          if (continueButton) continueButton.click();
+          if (continueButton)
+            await waitUntil(
+              () => continueButton.getAttribute("disabled") !== null
+            );
 
           setTimeout(resolve, 500);
         }, 200);
@@ -281,13 +319,14 @@ async function fillNewAd() {
 
       type(descriptionTextarea, adData.body);
 
-      setTimeout(() => {
+      setTimeout(async () => {
         // 0.2 second
         let continueButton = getAllElementsWithAttributeValue(
           "data-qa-id",
           "newad-button-next-description"
         )[0];
-        continueButton.click();
+
+        await waitUntil(() => continueButton.getAttribute("disabled") !== null);
 
         setTimeout(resolve, 500);
       }, 200);
@@ -303,13 +342,14 @@ async function fillNewAd() {
 
       type(priceInput, adData.price[0]);
 
-      setTimeout(() => {
+      setTimeout(async () => {
         // 0.2 second
         let continueButton = getAllElementsWithAttributeValue(
           "data-qa-id",
           "newad-button-next-price"
         )[0];
-        continueButton.click();
+
+        await waitUntil(() => continueButton.getAttribute("disabled") !== null);
 
         setTimeout(resolve, 500);
       }, 200);
@@ -330,12 +370,16 @@ async function fillNewAd() {
         reactElement.forceUpdate();
       }
 
-      setTimeout(() => {
+      setTimeout(async () => {
         let continueButton = getAllElementsWithAttributeValue(
           "data-qa-id",
           "newad-button-next-shipping"
         )[0];
-        continueButton.click();
+
+        if (continueButton)
+          await waitUntil(
+            () => continueButton.getAttribute("disabled") !== null
+          );
 
         setTimeout(resolve, 500);
       }, 500);
@@ -365,13 +409,14 @@ async function fillNewAd() {
         imageInput.dispatchEvent(drop);
       }
 
-      setTimeout(() => {
+      setTimeout(async () => {
         // 0.2 second
         let continueButton = getAllElementsWithAttributeValue(
           "data-qa-id",
           "newad-button-next-pictures"
         )[0];
-        continueButton.click();
+
+        await waitUntil(() => continueButton.getAttribute("disabled") !== null);
 
         setTimeout(resolve, 1000);
       }, 200);
@@ -400,10 +445,12 @@ async function fillNewAd() {
           // First click (to de-focus from the address bar)
           continueButton.click();
 
-          setTimeout(() => {
+          setTimeout(async () => {
             // 0.2 second
-            // Re-click ^^
-            continueButton.click();
+            // Wait for user second click
+            await waitUntil(
+              () => continueButton.getAttribute("disabled") !== null
+            );
 
             setTimeout(resolve, 500);
           }, 200);
