@@ -200,7 +200,9 @@ async function fillNewAd() {
             reactElement.props.isPro = true;
             reactElement.forceUpdate();
             */
-            reactElement.state.items.splice(1);
+            reactElement.state.items = [
+              { id: "41", topID: "24", name: "Jeux & Jouets", score: 9.0 },
+            ];
 
             // Select Category
             for (let category of reactElement.props.categories) {
