@@ -21,7 +21,8 @@
         "https://www.leboncoin.fr/deposer-une-annonce/",
         "https://www.leboncoin.fr/deposer-une-annonce"
       ],
-      "js": ["loadInForm.js"]
+      "js": ["loadInForm.js"],
+      "run_at": "document_start"
     }
   ]
 }

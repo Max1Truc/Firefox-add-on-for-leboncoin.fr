@@ -102,23 +102,6 @@ async function fillNewAd() {
     });
   }
 
-  function getDataURL(url) {
-    return new Promise((resolve, reject) => {
-      // Gets dataURL of an image (with the help of https://jsfiddle.net/handtrix/YvQ5y/4955)
-      var xhr = new XMLHttpRequest();
-      xhr.onload = function () {
-        var reader = new FileReader();
-        reader.onloadend = function () {
-          resolve(reader.result);
-        };
-        reader.readAsDataURL(xhr.response);
-      };
-      xhr.open("GET", url);
-      xhr.responseType = "blob";
-      xhr.send();
-    });
-  }
-
   function dataURLtoFile(dataurl, filename) {
     // Convert a data url to a File object (https://stackoverflow.com/a/30407840/9438168)
     var arr = dataurl.split(","),
@@ -142,6 +125,23 @@ async function fillNewAd() {
     return dT;
   }
 
+  function getDataURL(url) {
+    return new Promise((resolve, reject) => {
+      // Gets dataURL of an image (with the help of https://jsfiddle.net/handtrix/YvQ5y/4955)
+      var xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        var reader = new FileReader();
+        reader.onloadend = function () {
+          resolve(reader.result);
+        };
+        reader.readAsDataURL(xhr.response);
+      };
+      xhr.open("GET", url);
+      xhr.responseType = "blob";
+      xhr.send();
+    });
+  }
+
   function waitPageLoad() {
     return new Promise((resolve, _reject) => {
       var intervalID = setInterval(() => {
@@ -149,105 +149,64 @@ async function fillNewAd() {
           clearInterval(intervalID);
           resolve();
         }
-      }, 500);
+      }, 200);
     });
   }
 
-  function titleAndCategoryStep() {
-    return new Promise(async (resolve, _reject) => {
-      var subjectInput = document.getElementsByName("subject")[0];
+  async function titleAndCategoryStep() {
+    var subjectInput = document.getElementsByName("subject")[0];
 
-      if (!subjectInput) {
-        setTimeout(titleAndCategoryStep, 200);
-        return;
-      }
+    if (!subjectInput) {
+      await wait(200);
+      await titleAndCategoryStep();
+      return;
+    }
 
-      type(subjectInput, adData.subject);
+    await wait(200);
 
-      setTimeout(() => {
-        // 0.5 second
-        var confirmTitleButton = getAllElementsWithAttributeValue(
-          "data-qa-id",
-          "button__research"
-        )[0];
-        if (confirmTitleButton) confirmTitleButton.click();
+    type(subjectInput, adData.subject);
 
-        setTimeout(() => {
-          // 1 second
-          var otherCategoryLink = getAllElementsWithAttributeValue(
-            "data-test-id",
-            "item-default"
-          )[0];
-          if (otherCategoryLink) {
-            otherCategoryLink.click();
-          } else {
-            var chooseCategoryLink = getAllElementsWithAttributeValue(
-              "data-qa-id",
-              "newad-select_category"
-            )[0];
-            chooseCategoryLink.click();
+    await wait(500);
+
+    var confirmTitleButton = getAllElementsWithAttributeValue(
+      "data-qa-id",
+      "button_subject_research"
+    )[0];
+    confirmTitleButton.click();
+
+    await wait(1000);
+    await waitWhile(
+      () =>
+        getAllElementsWithAttributeValue("xlink:href", "#SvgChevrondown")
+          .length == 0
+    );
+    var otherCategoryLink = getAllElementsWithAttributeValue(
+      "xlink:href",
+      "#SvgChevrondown"
+    )[0].parentElement.parentElement;
+    if (otherCategoryLink) {
+      otherCategoryLink.click();
+
+      await wait(200);
+      var categoryElement = document.getElementsByClassName("Linsting")[0];
+      var reactElement =
+        categoryElement[Object.keys(categoryElement)[1]].children;
+
+      // Select Category
+      for (let category of reactElement.props.brikkeCatByUserType) {
+        for (let subcategory of category.subcategories) {
+          if (subcategory.name == adData.category_name) {
+            reactElement.props.selectCategory(
+              category.id,
+              subcategory.id,
+              subcategory.name,
+              "list"
+            );
+            break;
           }
-
-          setTimeout(async () => {
-            var categoryElement =
-              subjectInput.parentElement.parentElement.parentElement
-                .parentElement.parentElement.parentElement.nextSibling;
-            var reactElement =
-              categoryElement[Object.keys(categoryElement)[0]]._currentElement
-                ._owner._instance;
-
-            /*
-            reactElement.props.isPro = true;
-            reactElement.forceUpdate();
-            */
-            reactElement.state.items = [
-              { id: "41", topID: "24", name: "Jeux & Jouets", score: 9.0 },
-            ];
-
-            // Select Category
-            for (let category of reactElement.props.categories) {
-              for (let subcategory of category.subcategories) {
-                if (subcategory.name == adData.category_name) {
-                  reactElement
-                    .selectCategory(
-                      category.id,
-                      subcategory.id,
-                      subcategory.name,
-                      "list"
-                    )
-                    .then(() => {
-                      /*
-                      reactElement.props.isPro = false;
-                      reactElement.forceUpdate();
-                      */
-
-                      // Wait for click on continue
-                      setTimeout(async () => {
-                        let button = getAllElementsWithAttributeValue(
-                          "data-qa-id",
-                          "newad-button-next-categories"
-                        )[0];
-
-                        await waitUntil(
-                          () => button.getAttribute("disabled") !== null
-                        );
-
-                        // Resolve the promise
-                        setTimeout(resolve, 200);
-                      }, 200);
-                    });
-                }
-              }
-            }
-            /*
-          reactElement.setState({
-            toggleSelect: false,
-          });
-          */
-          }, 200);
-        }, 1000);
-      }, 500);
-    });
+        }
+      }
+    }
   }
 
   function conditionStep() {
@@ -290,25 +249,25 @@ async function fillNewAd() {
             }
           }, 200);
         }
-
-        setTimeout(async () => {
-          // 0.2 second
-          var continueButton = getAllElementsWithAttributeValue(
-            "data-qa-id",
-            "newad-button-next-ad_params"
-          )[0];
-
-          // Some categories do not allow a "condition" option,
-          // And in those cases the view with this continue
-          // button isn't shown.
-          if (continueButton)
-            await waitUntil(
-              () => continueButton.getAttribute("disabled") !== null
-            );
-
-          setTimeout(resolve, 500);
-        }, 200);
       }, 200);
+
+      var continueButton = getAllElementsWithAttributeValue(
+        "data-qa-id",
+        "depositad-button-next-ad_params"
+      )[0];
+
+      // Some categories do not allow a "condition" option,
+      // And in those cases the view with this continue
+      // button isn't shown.
+      var firstExec = true;
+      if (continueButton)
+        continueButton.addEventListener("click", (e) => {
+          if (firstExec) {
+            firstExec = false;
+            setTimeout(() => resolve(), 200);
+          }
+        });
+      else setTimeout(resolve, 200);
     });
   }
 
@@ -316,7 +275,7 @@ async function fillNewAd() {
     return new Promise((resolve, _reject) => {
       let descriptionTextarea = getAllElementsWithAttributeValue(
         "data-qa-id",
-        "newad-text_body"
+        "depositad-text_body"
       )[0];
 
       type(descriptionTextarea, adData.body);
@@ -325,12 +284,16 @@ async function fillNewAd() {
         // 0.2 second
         let continueButton = getAllElementsWithAttributeValue(
           "data-qa-id",
-          "newad-button-next-description"
+          "depositad-button-next-description"
         )[0];
 
-        await waitUntil(() => continueButton.getAttribute("disabled") !== null);
-
-        setTimeout(resolve, 500);
+        var firstExec = true;
+        continueButton.addEventListener("click", (e) => {
+          if (firstExec) {
+            firstExec = false;
+            setTimeout(() => resolve(), 200);
+          }
+        });
       }, 200);
     });
   }
@@ -339,7 +302,7 @@ async function fillNewAd() {
     return new Promise((resolve, _reject) => {
       let priceInput = getAllElementsWithAttributeValue(
         "data-qa-id",
-        "newad-input_price"
+        "depositad-input_price"
       )[0];
 
       type(priceInput, adData.price[0]);
@@ -348,21 +311,26 @@ async function fillNewAd() {
         // 0.2 second
         let continueButton = getAllElementsWithAttributeValue(
           "data-qa-id",
-          "newad-button-next-price"
+          "depositad-button-next-price"
         )[0];
 
-        await waitUntil(() => continueButton.getAttribute("disabled") !== null);
-
-        setTimeout(resolve, 500);
+        var firstExec = true;
+        continueButton.addEventListener("click", (e) => {
+          if (firstExec) {
+            firstExec = false;
+            setTimeout(() => resolve(), 200);
+          }
+        });
       }, 200);
     });
   }
 
   function deliveryStep() {
     return new Promise((resolve, _reject) => {
+      /*
       let estimated_weight_select = getAllElementsWithAttributeValue(
         "data-qa-id",
-        "newad-input_estimated_parcel_weight"
+        "depositad-input_estimated_parcel_weight"
       )[0];
       if (estimated_weight_select) {
         let reactElement =
@@ -371,56 +339,75 @@ async function fillNewAd() {
         reactElement.props.value = parseInt(adData["estimated_parcel_weight"]);
         reactElement.forceUpdate();
       }
+      */
 
       setTimeout(async () => {
         let continueButton = getAllElementsWithAttributeValue(
           "data-qa-id",
-          "newad-button-next-shipping"
+          "depositad-button-next-shipping"
         )[0];
 
+        var firstExec = true;
         if (continueButton)
-          await waitUntil(
-            () => continueButton.getAttribute("disabled") !== null
-          );
-
-        setTimeout(resolve, 500);
+          continueButton.addEventListener("click", (e) => {
+            if (firstExec) {
+              firstExec = false;
+              setTimeout(() => resolve(), 200);
+            }
+          });
+        else setTimeout(resolve, 200);
       }, 500);
     });
   }
 
   function imageUploadStep() {
     return new Promise(async (resolve, _reject) => {
-      // Remove already-uploaded images
-      while (getAllElementsWithAttributeValue("name", "close").length > 0) {
-        getAllElementsWithAttributeValue("name", "close")[0].click();
-      }
+      setTimeout(async () => {
+        // Remove already-uploaded images
+        while (
+          getAllElementsWithAttributeValue(
+            "data-qa-id",
+            "depositad-remove-image"
+          ).length > 0
+        ) {
+          getAllElementsWithAttributeValue(
+            "data-qa-id",
+            "depositad-remove-image"
+          )[0].click();
+        }
 
-      // Upload ad images
-      for (var image_url of adData["images"]["urls_large"]) {
-        let image_base64 = await getDataURL(image_url);
-        let fileInput = getAllElementsWithAttributeValue("type", "file")[0],
-          imageInput = getAllElementsWithAttributeValue(
-            "aria-disabled",
-            "false"
-          )[0];
-        let dataTransfer = uploadImageFromDataURL(fileInput, image_base64);
-        var drop = new DragEvent("drop", {
-          bubbles: true,
-          dataTransfer,
-        });
-        imageInput.dispatchEvent(drop);
-      }
+        // Upload ad images
+        for (var image_url of adData["images"]["urls_large"]) {
+          console.log(`Upload ${image_url}`);
+          let image_base64 = await getDataURL(image_url);
+          console.log(2);
+          let fileInput = getAllElementsWithAttributeValue("type", "file")[0];
+          console.log(3);
+          let dataTransfer = uploadImageFromDataURL(fileInput, image_base64);
+          console.log(4);
+          var drop = new DragEvent("drop", {
+            bubbles: true,
+            dataTransfer,
+          });
+          console.log(5);
+          document.getElementById("__next").dispatchEvent(drop);
+        }
+      }, 200);
 
       setTimeout(async () => {
         // 0.2 second
         let continueButton = getAllElementsWithAttributeValue(
           "data-qa-id",
-          "newad-button-next-pictures"
+          "depositad-button-next-pictures"
         )[0];
 
-        await waitUntil(() => continueButton.getAttribute("disabled") !== null);
-
-        setTimeout(resolve, 1000);
+        var firstExec = true;
+        continueButton.addEventListener("click", (e) => {
+          if (firstExec) {
+            firstExec = false;
+            setTimeout(() => resolve(), 1000);
+          }
+        });
       }, 200);
     });
   }
@@ -429,30 +416,34 @@ async function fillNewAd() {
     return new Promise((resolve, _reject) => {
       let addressBar = getAllElementsWithAttributeValue(
         "data-qa-id",
-        "newad-input_address"
+        "depositad-input_address"
       )[0];
       type(addressBar, adData.location.city_label);
 
       setTimeout(() => {
         // 0.2 second
-        let searchButton = addressBar.nextSibling;
+        let searchButton = addressBar.parentElement.parentElement.nextSibling.children[0];
         searchButton.click();
 
         setTimeout(() => {
           // 0.2 second
           let continueButton = getAllElementsWithAttributeValue(
             "data-qa-id",
-            "newad-button-next-undefined"
+            "depositad-button-next-coordinates"
           )[0];
           // First click (to de-focus from the address bar)
           continueButton.click();
 
           setTimeout(async () => {
             // 0.2 second
-            // Wait for user second click
-            await waitUntil(
-              () => continueButton.getAttribute("disabled") !== null
-            );
+            // Wait for user click
+            var firstExec = true;
+            continueButton.addEventListener("click", (e) => {
+              if (firstExec) {
+                firstExec = false;
+                setTimeout(() => resolve(), 1000);
+              }
+            });
 
             setTimeout(resolve, 500);
           }, 200);
