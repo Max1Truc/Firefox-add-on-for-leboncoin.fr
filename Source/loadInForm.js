@@ -116,7 +116,9 @@ async function fillNewAd() {
   }
 
   function uploadImageFromDataURL(fileInputElement, dataurl) {
-    const dT = new DataTransfer();
+    let dT = new DataTransfer();
+    dT.dropEffect = "move";
+    dT.effectAllowed = "uninitialized";
     var file = dataURLtoFile(dataurl, "image.jpg");
     dT.items.add(file);
 
@@ -380,17 +382,21 @@ async function fillNewAd() {
         for (var image_url of adData["images"]["urls_large"]) {
           console.log(`Upload ${image_url}`);
           let image_base64 = await getDataURL(image_url);
-          console.log(2);
           let fileInput = getAllElementsWithAttributeValue("type", "file")[0];
-          console.log(3);
           let dataTransfer = uploadImageFromDataURL(fileInput, image_base64);
-          console.log(4);
+          var dragEnter = new DragEvent("dragenter", {
+            bubbles: true,
+            dataTransfer,
+            buttons: 1,
+            composed: true,
+          });
           var drop = new DragEvent("drop", {
             bubbles: true,
             dataTransfer,
+            composed: true,
           });
-          console.log(5);
-          document.getElementById("__next").dispatchEvent(drop);
+          fileInput.nextSibling.dispatchEvent(dragEnter);
+          fileInput.nextSibling.dispatchEvent(drop);
         }
       }, 200);
 
